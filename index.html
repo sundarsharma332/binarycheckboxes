@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary to Decimal Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .checkbox-input {
+            width: 30px;
+            height: 30px;
+            appearance: checkbox;
+            /* Normal checkbox appearance */
+            border: 2px solid #000;
+            border-radius: 4px;
+            margin: 0;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .checkbox-input:checked {
+            border-color: transparent;
+            /* Remove border color when checked */
+        }
+
+        .checkbox-input:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px;
+            height: 16px;
+            background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath fill="white" d="M10 15.172l-3.586-3.586L5 10l5 5 9-9 1.414 1.414L10 15.172z"/%3E%3C/svg%3E') no-repeat center center;
+            background-size: 16px 16px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="text-center p-8 bg-white rounded-lg">
+        <h1 class="text-2xl font-bold mb-6">Binary to Decimal Converter</h1>
+        <div class="grid grid-cols-8 gap-1 mb-6">
+            <!-- Checkboxes will be dynamically generated here -->
+        </div>
+        <input id="decimalValue" type="number" class="p-2 border border-gray-300 rounded-lg w-full mb-4"
+            placeholder="Enter decimal value">
+        <button id="resetButton" class="bg-blue-500 text-white p-2 rounded">Reset</button>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.querySelector('.grid');
+            const decimalInput = document.getElementById('decimalValue');
+            const resetButton = document.getElementById('resetButton');
+
+            // Array of dark colors for checkboxes
+            const darkColors = ['#1e3a8a', '#1d4ed8', '#4b5563', '#6b7280', '#374151', '#111827', '#0f172a', '#0d9488'];
+            let colorIndex = 0;
+
+            // Function to generate a unique dark color
+            function getRandomDarkColor() {
+                const color = darkColors[colorIndex];
+                colorIndex = (colorIndex + 1) % darkColors.length;
+                return color;
+            }
+
+            // Create checkboxes
+            for (let i = 0; i < 64; i++) {
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'checkbox-input';
+                checkbox.dataset.index = i; // Store index for color application
+                checkbox.addEventListener('change', updateDecimal);
+                container.appendChild(checkbox);
+            }
+
+            function updateDecimal() {
+                let decimalValue = 0;
+                const checkboxes = document.querySelectorAll('.checkbox-input');
+                checkboxes.forEach((checkbox, index) => {
+                    if (checkbox.checked) {
+                        decimalValue += Math.pow(2, 63 - index);
+                    }
+                });
+                decimalInput.value = decimalValue;
+            }
+
+            function updateCheckboxes() {
+                const decimalValue = parseInt(decimalInput.value, 10) || 0;
+                const checkboxes = document.querySelectorAll('.checkbox-input');
+                checkboxes.forEach((checkbox, index) => {
+                    const bitValue = Math.pow(2, 63 - index);
+                    if (decimalValue & bitValue) {
+                        checkbox.checked = true;
+                        checkbox.style.backgroundColor = getRandomDarkColor();
+                    } else {
+                        checkbox.checked = false;
+                    }
+                });
+            }
+
+            decimalInput.addEventListener('input', updateCheckboxes);
+
+            resetButton.addEventListener('click', () => {
+                decimalInput.value = '';
+                document.querySelectorAll('.checkbox-input').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
